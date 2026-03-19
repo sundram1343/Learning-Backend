@@ -13,8 +13,14 @@ app.get('/', (req, res) => {
     })
     
 });
-app.post('/add', (req, res) => {
-    fs.writeFile(`./files/${req.bbody.tittle.split(' ').join()}.txt`,req.body.details,function (params) {
+app.get('/files/:filename', (req, res) => {
+    fs.readFile(`./files/${req.params.filename}`,"utf-8",function(err,filedata){
+        res.render('show',{filename:req.params.filename,filedata:filedata})
+    })
+    
+});
+app.post('/create', (req, res) => {
+    fs.writeFile(`./files/${req.body.title.split(' ').join('')}.txt`,req.body.details,function (params) {
         res.redirect("/")
     })
 })
