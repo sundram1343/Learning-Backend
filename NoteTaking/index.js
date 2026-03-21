@@ -24,4 +24,12 @@ app.post('/create', (req, res) => {
         res.redirect("/")
     })
 })
+app.get('/edit/:filename',(req,res)=>{
+    res.render('edit',{filename:req.params.filename});
+})
+app.post('/edit',(req,res)=>{
+    fs.rename(`./files/${req.body.previous}`,`./files/${req.body.newname}`,function(err){
+        res.redirect('/')
+    })
+})
 app.listen(3000);

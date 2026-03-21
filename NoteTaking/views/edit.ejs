@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Note Taking App</title>
+   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+    <div class="main w-full min-h-screen bg-zinc-900 p-10 text-white">
+        <a class="text-blue-500 inline-block mb-10" href="/">go back to home</a>
+         <form action="/edit" method="POST">
+            <input type="text" placeholder="previous name" name="previous" class="block w-1/4 rounded-md outline-none px-5 py-2 text-zinc-500 bg-zinc-800" value="<%=filename%>" disabled="true">
+            <input type="text" placeholder="New name" name="newname" class="block w-1/4 rounded-md outline-none px-5 py-2 bg-zinc-800 mt-2">
+            <button class="mt-2 bg-yellow-600 px-5 py-2 rounded-md" type="submit" value="Create Task">Update name</button>
+        </form>
+    </div>
+</body>
+</html>
