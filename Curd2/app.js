@@ -21,10 +21,15 @@ app.post('/create',async (req,res)=>{
         email,
         image
     })
-    res.redirect('/read')
+    res.redirect('/read');
 })
-app.get('/delete',async (req,res)=>{
+app.get('/delete/:id',async (req,res)=>{
     let users=await userModel.findOneAndDelete({_id:req.params.id});
     res.render('/read')
+})
+app.post('/edit/:id',async (req,res)=>{
+    let {image,name,email}=req.body;
+    let user= await userModel.findOneAndUpdate({_id:req.params.userid},{image,name,email},{new:true});
+    res.render('/read',{user});
 })
 app.listen(3000);
