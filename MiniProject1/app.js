@@ -16,10 +16,25 @@ app.get('/',(req,res)=>{
 app.get('/login',(req,res)=>{
     res.render('login')
 })
+app.get('/profile',isLoggedIn,async (req,res)=>{
+    let user=await userModel.findOne({email:req.user.email}).populate('posts');
+    res.render('profile',{user})
+})
+app.post('/post',isLoggedIn,async (req,res)=>{
+    let user=await userModel.findOne({email:req.user.email})
+    let {content}=req.body;
+    let post=await postModel.create({
+        user:user._id,
+        content
+    })
+    user.posts.push(post._id);
+    await user.save();
+    res.redirect('/profile');
+})
 app.post('/register',async (req,res)=>{
     let{email,password,username,name,age}=req.body;
     let user= await userModel.findOne({email})
-    if(user) return res.status(5000).send("User already Registered");
+    if(user) return res.status(500).send("User already Registered");
 
     bcrypt.genSalt(10,(err,salt)=>{
         bcrypt.hash(password,salt,async (err,hash)=>{
@@ -30,9 +45,9 @@ app.post('/register',async (req,res)=>{
                 name,
                 password:hash
             });
-           let token= jwt.sign({email:email,userid:user._id},'Shhhh');
-           res.cookie(token);
-           res.send('registered');
+           let token= jwt.sign({email:email,userid:newUser._id},'Shhhh');
+           res.cookie('token',token);
+           res.redirect('/login');
         })
     })
 
@@ -44,8 +59,8 @@ app.post('/login',async (req,res)=>{
     bcrypt.compare(password,user.password,(err,result)=>{
         if(result) {
             let token= jwt.sign({email:email,userid:user._id},'Shhhh');
-           res.cookie(token);
-            res.status(200).send('You can Login');
+           res.cookie('token',token);
+            res.status(200).redirect('/profile');
             
         }
         else res.redirect('/login')
@@ -56,10 +71,10 @@ app.get('/logout',(req,res)=>{
     res.cookie('token','');
     res.redirect('login')
 })
-function isLoggedIn(req,res,nex){
-    if(req.cookies.token==='')res.send('You Must Be logged In');
+function isLoggedIn(req,res,next){
+    if(!req.cookies.token)res.redirect('/login');
     else{
-        let user=jwt.verify(req.cookies.token,'Shhhh');
+        let data=jwt.verify(req.cookies.token,'Shhhh');
         req.user=data
     }
     next();
